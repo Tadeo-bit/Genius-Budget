@@ -24,6 +24,20 @@ class CampaignControllerTest {
                 .andExpect(jsonPath("$.length()").value(6));
     }
 
+        @Test
+        void getCampaigns_filterByStatus_returnsMatchingCampaigns() throws Exception {
+                mockMvc.perform(get("/api/campaigns").param("status", "active"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(3));
+        }
+
+        @Test
+        void getCampaigns_filterByClient_returnsMatchingCampaigns() throws Exception {
+                mockMvc.perform(get("/api/campaigns").param("client", "TechStore"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(2));
+        }
+
     @Test
     void getCampaignById_existingId_returnsCampaign() throws Exception {
         mockMvc.perform(get("/api/campaigns/3"))
@@ -49,6 +63,7 @@ class CampaignControllerTest {
                 .andExpect(jsonPath("$.client").value("SuenoSimple"))
                 .andExpect(jsonPath("$.totalBudget").value(120000.0))
                 .andExpect(jsonPath("$.spent").value(67800.0))
+                .andExpect(jsonPath("$.remaining").value(52200.0))
                 .andExpect(jsonPath("$.percentageUsed").exists());
     }
 
@@ -114,6 +129,31 @@ class CampaignControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createCampaign_validPayload_returnsCreatedCampaign() throws Exception {
+        String body = """
+                {
+                  "name": "Campana Nueva Camila",
+                  "client": "SuenoSimple",
+                  "type": "social_ads",
+                  "status": "draft",
+                  "budget": 95000.0,
+                  "currency": "ARS",
+                  "startDate": "2026-07-01",
+                  "endDate": "2026-08-01"
+                }
+                """;
+
+        mockMvc.perform(post("/api/campaigns")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("Campana Nueva Camila"))
+                .andExpect(jsonPath("$.client").value("SuenoSimple"))
+                .andExpect(jsonPath("$.spent").value(0.0));
     }
 
     @Test

@@ -24,12 +24,18 @@ public class CampaignController {
     private CampaignService campaignService;
 
     @GetMapping
-    @Operation(summary = "Listar campanas", description = "Retorna todas las campanas. Acepta filtro opcional por status.")
-    public ResponseEntity<List<Campaign>> getCampaigns(@RequestParam(required = false) String status) {
-        if (status != null && !status.isBlank()) {
-            return ResponseEntity.ok(campaignService.getCampaignsByStatus(status));
-        }
-        return ResponseEntity.ok(campaignService.getAllCampaigns());
+    @Operation(summary = "Listar campanas", description = "Retorna todas las campanas. Acepta filtros opcionales por status y cliente.")
+    public ResponseEntity<List<Campaign>> getCampaigns(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String client
+    ) {
+        return ResponseEntity.ok(campaignService.getCampaigns(status, client));
+    }
+
+    @PostMapping
+    @Operation(summary = "Crear campana")
+    public ResponseEntity<Campaign> createCampaign(@RequestBody Campaign campaign) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(campaignService.createCampaign(campaign));
     }
 
     @GetMapping("/summary")

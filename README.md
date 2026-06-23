@@ -79,7 +79,9 @@ La colección también puede importarse en Postman usando la especificación Ope
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
+| POST | `/api/campaigns` | Crear una campaña nueva |
 | GET | `/api/campaigns` | Listar todas las campañas |
+| GET | `/api/campaigns?client={client}` | Filtrar campañas por cliente |
 | GET | `/api/campaigns?status={status}` | Filtrar campañas por estado |
 | GET | `/api/campaigns/summary` | KPIs globales de campañas activas |
 | GET | `/api/campaigns/{id}` | Obtener campaña por ID |
