@@ -73,3 +73,17 @@ mvn spring-boot:run
 - Se corrigio la logica de filtro por estado para usar `campaign.status`.
 - Se corrigio `remaining = budget - spent` en el resumen.
 - Se agregaron pruebas de controlador para filtro por cliente, filtro por estado y alta de campana.
+
+### 2026-06-23 — BM-F03 (Ajuste de DoD)
+
+**Problema detectado**
+
+- El filtro por cliente no contemplaba tildes/acentos, por lo que `SueñoSimple` podia no coincidir con datos cargados como `SuenoSimple`.
+- Las validaciones de alta de campana devolvian 404 al usar `RuntimeException`, cuando correspondia 400 para errores de request.
+
+**Modificacion realizada**
+
+- Se normalizaron strings con eliminacion de diacriticos para filtros (`client`/`status`) y asegurar coincidencias como `SueñoSimple`.
+- Las validaciones de negocio en creacion de campana ahora lanzan `IllegalArgumentException`.
+- Se agrego handler especifico para `IllegalArgumentException` con HTTP 400 en el `GlobalExceptionHandler`.
+- Se agregaron pruebas para filtro por cliente con acento y alta invalida con respuesta 400.

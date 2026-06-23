@@ -8,6 +8,7 @@ import com.genius.budgetmanager.repository.CampaignRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -32,16 +33,16 @@ public class CampaignService {
     // Fix BM-F01: habilitar alta de nuevas campanas desde API.
     public Campaign createCampaign(Campaign campaign) {
         if (campaign == null) {
-            throw new RuntimeException("Campaign payload is required");
+            throw new IllegalArgumentException("Campaign payload is required");
         }
         if (campaign.getName() == null || campaign.getName().isBlank()) {
-            throw new RuntimeException("Campaign name is required");
+            throw new IllegalArgumentException("Campaign name is required");
         }
         if (campaign.getClient() == null || campaign.getClient().isBlank()) {
-            throw new RuntimeException("Campaign client is required");
+            throw new IllegalArgumentException("Campaign client is required");
         }
         if (campaign.getBudget() == null || campaign.getBudget() < 0) {
-            throw new RuntimeException("Campaign budget must be >= 0");
+            throw new IllegalArgumentException("Campaign budget must be >= 0");
         }
 
         if (campaign.getStatus() == null || campaign.getStatus().isBlank()) {
@@ -125,6 +126,8 @@ public class CampaignService {
         if (value == null || value.isBlank()) {
             return null;
         }
-        return value.trim().toLowerCase(Locale.ROOT);
+        String trimmed = value.trim().toLowerCase(Locale.ROOT);
+        String normalized = Normalizer.normalize(trimmed, Normalizer.Form.NFD);
+        return normalized.replaceAll("\\p{M}+", "");
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CampaignControllerTest {
 
     @Autowired
@@ -36,6 +38,13 @@ class CampaignControllerTest {
                 mockMvc.perform(get("/api/campaigns").param("client", "TechStore"))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.length()").value(2));
+        }
+
+        @Test
+        void getCampaigns_filterByClientWithAccent_returnsMatchingCampaigns() throws Exception {
+                mockMvc.perform(get("/api/campaigns").param("client", "SueñoSimple"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(4));
         }
 
     @Test
@@ -154,6 +163,23 @@ class CampaignControllerTest {
                 .andExpect(jsonPath("$.name").value("Campana Nueva Camila"))
                 .andExpect(jsonPath("$.client").value("SuenoSimple"))
                 .andExpect(jsonPath("$.spent").value(0.0));
+    }
+
+    @Test
+    void createCampaign_missingClient_returnsBadRequest() throws Exception {
+        String body = """
+                {
+                  "name": "Campana invalida",
+                  "type": "social_ads",
+                  "budget": 1000.0
+                }
+                """;
+
+        mockMvc.perform(post("/api/campaigns")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists());
     }
 
     @Test
