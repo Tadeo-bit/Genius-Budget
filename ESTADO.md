@@ -103,3 +103,18 @@ mvn spring-boot:run
 
 - Rama: `fix/bm-campaign-create-client-filter`
 - Commit: `5225d30` — `fix(budget): redirige la ruta raíz a swagger para evitar 404`
+
+### 2026-06-24 — BM-F05: CORS para Genius-Landings y Genius-Dashboard
+
+**Problema detectado**
+
+- `GET /api/campaigns` desde `http://localhost:8000` (Genius-Landings) y `http://localhost:5173` (Genius-Dashboard) era bloqueado por política CORS: `No 'Access-Control-Allow-Origin' header is present`.
+
+**Cambios realizados**
+
+- Se agregó `@CrossOrigin(origins = {"http://localhost:8000", "http://localhost:5173"})` en `CampaignController.java`.
+
+**Verificaciones**
+
+- `curl -H "Origin: http://localhost:8000"` a `/api/campaigns` devuelve cabecera `Access-Control-Allow-Origin`.
+- La página de clientes de Genius-Landings carga campañas sin errores CORS tras reiniciar el servidor.

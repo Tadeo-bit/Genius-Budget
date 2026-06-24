@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/campaigns")
+@CrossOrigin(origins = {"http://localhost:8000", "http://localhost:5173"})
 @Tag(name = "Campaigns", description = "Gestion de campanas y presupuestos")
 public class CampaignController {
 
