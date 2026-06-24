@@ -87,3 +87,19 @@ mvn spring-boot:run
 - Las validaciones de negocio en creacion de campana ahora lanzan `IllegalArgumentException`.
 - Se agrego handler especifico para `IllegalArgumentException` con HTTP 400 en el `GlobalExceptionHandler`.
 - Se agregaron pruebas para filtro por cliente con acento y alta invalida con respuesta 400.
+
+### 2026-06-24 — BM-F04 (Acceso raiz sin Whitelabel)
+
+**Problema detectado**
+
+- Al abrir `http://localhost:8080/` se mostraba 404/Whitelabel, generando confusion aunque la API estuviera operativa.
+
+**Modificacion realizada**
+
+- Se agrego `HomeController` para redirigir la ruta raiz `/` hacia `swagger-ui.html`.
+- Se verifico que `GET /` retorna `302` y que `GET /api/campaigns` sigue respondiendo `200`.
+
+**Commit y rama**
+
+- Rama: `fix/bm-campaign-create-client-filter`
+- Commit: `5225d30` — `fix(budget): redirige la ruta raíz a swagger para evitar 404`
