@@ -53,7 +53,7 @@ class CampaignControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(3))
                 .andExpect(jsonPath("$.name").value("Social Ads Q1 2026"))
-                .andExpect(jsonPath("$.client").value("SuenoSimple"))
+                .andExpect(jsonPath("$.client").value("SueñoSimple"))
                 .andExpect(jsonPath("$.status").value("active"));
     }
 
@@ -69,7 +69,7 @@ class CampaignControllerTest {
         mockMvc.perform(get("/api/campaigns/3/summary"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.campaignId").value(3))
-                .andExpect(jsonPath("$.client").value("SuenoSimple"))
+                .andExpect(jsonPath("$.client").value("SueñoSimple"))
                 .andExpect(jsonPath("$.totalBudget").value(120000.0))
                 .andExpect(jsonPath("$.spent").value(67800.0))
                 .andExpect(jsonPath("$.remaining").value(52200.0))
@@ -145,7 +145,7 @@ class CampaignControllerTest {
         String body = """
                 {
                   "name": "Campana Nueva Camila",
-                  "client": "SuenoSimple",
+                  "client": "SueñoSimple",
                   "type": "social_ads",
                   "status": "draft",
                   "budget": 95000.0,
@@ -161,7 +161,7 @@ class CampaignControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Campana Nueva Camila"))
-                .andExpect(jsonPath("$.client").value("SuenoSimple"))
+                .andExpect(jsonPath("$.client").value("SueñoSimple"))
                 .andExpect(jsonPath("$.spent").value(0.0));
     }
 
