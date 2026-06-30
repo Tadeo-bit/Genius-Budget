@@ -67,6 +67,21 @@ public class CampaignRepository {
                 .collect(Collectors.toList());
     }
 
+    public Campaign updateCampaign(Long id, Campaign patch) {
+        Campaign existing = findById(id)
+                .orElseThrow(() -> new RuntimeException("Campaign not found: " + id));
+        if (patch.getName() != null && !patch.getName().isBlank())  existing.setName(patch.getName());
+        if (patch.getClient() != null && !patch.getClient().isBlank()) existing.setClient(patch.getClient());
+        if (patch.getType() != null && !patch.getType().isBlank())   existing.setType(patch.getType());
+        if (patch.getStatus() != null && !patch.getStatus().isBlank()) existing.setStatus(patch.getStatus());
+        if (patch.getBudget() != null)    existing.setBudget(patch.getBudget());
+        if (patch.getSpent() != null)     existing.setSpent(patch.getSpent());
+        if (patch.getCurrency() != null && !patch.getCurrency().isBlank()) existing.setCurrency(patch.getCurrency());
+        if (patch.getStartDate() != null) existing.setStartDate(patch.getStartDate());
+        if (patch.getEndDate() != null)   existing.setEndDate(patch.getEndDate());
+        return existing;
+    }
+
     public Expense saveExpense(Expense expense) {
         expense.setId(nextExpenseId++);
         expenses.add(expense);

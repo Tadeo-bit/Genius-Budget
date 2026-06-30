@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/campaigns")
@@ -73,5 +74,21 @@ public class CampaignController {
     @Operation(summary = "Actualizar presupuesto de la campana")
     public ResponseEntity<Campaign> updateBudget(@PathVariable Long id, @RequestBody BudgetUpdateRequest request) {
         return ResponseEntity.ok(campaignService.updateBudget(id, request.getBudget()));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Actualizar datos de una campaña")
+    public ResponseEntity<Campaign> updateCampaign(@PathVariable Long id, @RequestBody Campaign campaign) {
+        return ResponseEntity.ok(campaignService.updateCampaign(id, campaign));
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Cambiar estado de una campaña")
+    public ResponseEntity<Campaign> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String status = body.get("status");
+        if (status == null || status.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(campaignService.updateStatus(id, status));
     }
 }

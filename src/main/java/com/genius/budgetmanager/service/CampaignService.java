@@ -115,6 +115,22 @@ public class CampaignService {
         return summary;
     }
 
+    public Campaign updateCampaign(Long id, Campaign patch) {
+        if (patch.getBudget() != null && patch.getBudget() < 0) {
+            throw new IllegalArgumentException("Budget must be >= 0");
+        }
+        return repository.updateCampaign(id, patch);
+    }
+
+    public Campaign updateStatus(Long id, String status) {
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Status is required");
+        }
+        Campaign patch = new Campaign();
+        patch.setStatus(status);
+        return repository.updateCampaign(id, patch);
+    }
+
     public Campaign updateBudget(Long campaignId, Double newBudget) {
         Campaign campaign = getCampaignById(campaignId);
         campaign.setSpent(0.0);
