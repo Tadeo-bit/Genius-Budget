@@ -9,12 +9,12 @@
 
 ## 0. Preparación del entorno
 
-- [x] 0.1  Clonar/actualizar repositorio (`git pull`)
-- [x] 0.2  Verificar Java 17+ y Maven 3.8+ instalados
-- [x] 0.3  Ejecutar `mvn test` — **18 tests OK** (17 CampaignController + 1 ApplicationContext)
-- [x] 0.4  Iniciar servidor con `mvn spring-boot:run`
-- [x] 0.5  Abrir `http://localhost:8080/swagger-ui.html` — Swagger carga sin errores
-- [x] 0.6  `GET /` → redirección **302** a Swagger (no 404)
+- [✓] 0.1  Clonar/actualizar repositorio (`git pull`)
+- [✓] 0.2  Verificar Java 17+ y Maven 3.8+ instalados
+- [✓] 0.3  Ejecutar `mvn test` — **18 tests OK** (17 CampaignController + 1 ApplicationContext)
+- [✓] 0.4  Iniciar servidor con `mvn spring-boot:run`
+- [✓] 0.5  Abrir `http://localhost:8080/swagger-ui.html` — Swagger carga sin errores
+- [✓] 0.6  `GET /` → redirección **302** a Swagger (no 404)
 
 ---
 
@@ -22,25 +22,25 @@
 
 ### 1.1 Casos exitosos
 
-- [x] 1.1.1  Enviar todos los campos → `201 Created` + `id` autoasignado
-- [ ] 1.1.2 Enviar solo `name` + `client` → `201` + defaults: `status=draft`, `spent=0.0`, `currency=ARS`
+- [✓] 1.1.1  Enviar todos los campos → `201 Created` + `id` autoasignado
+- [x] 1.1.2 Enviar solo `name` + `client` → `201` + defaults: `status=draft`, `spent=0.0`, `currency=ARS`
       Resultado obtenido: `400 Bad Request`
       Mensaje: `"Campaign budget must be >= 0"`
       Observación: la implementación actual requiere el campo `budget`.
-- [x] 1.1.3  Crear 2 campañas seguidas → IDs consecutivos (7, 8, …)
-- [x] 1.1.4  `budget=0` → `201` (válido según negocio)
-- [x] 1.1.5  `status=active` → `201` con status preservado
+- [✓] 1.1.3  Crear 2 campañas seguidas → IDs consecutivos (7, 8, …)
+- [✓] 1.1.4  `budget=0` → `201` (válido según negocio)
+- [✓] 1.1.5  `status=active` → `201` con status preservado
 
 ### 1.2 Casos de error (deben devolver 400)
 
-- [x] 1.2.1  Body `{}` → `400` + `"Campaign payload is required"`
-- [x] 1.2.2  Sin campo `name` → `400` + `"Campaign name is required"`
-- [x] 1.2.3  `name=""` → `400`
-- [x] 1.2.4  Sin campo `client` → `400` + `"Campaign client is required"`
-- [x] 1.2.5  `client=""` → `400`
-- [x] 1.2.6  `budget=-100` → `400` + `"Campaign budget must be >= 0"`
-- [x] 1.2.7  `budget=null` → `400`
-- [x] 1.2.8  JSON mal formado → `400`
+- [✓] 1.2.1  Body `{}` → `400` + `"Campaign payload is required"`
+- [✓] 1.2.2  Sin campo `name` → `400` + `"Campaign name is required"`
+- [✓] 1.2.3  `name=""` → `400`
+- [✓] 1.2.4  Sin campo `client` → `400` + `"Campaign client is required"`
+- [✓] 1.2.5  `client=""` → `400`
+- [✓] 1.2.6  `budget=-100` → `400` + `"Campaign budget must be >= 0"`
+- [✓] 1.2.7  `budget=null` → `400`
+- [✓] 1.2.8  JSON mal formado → `400`
 
 ---
 
@@ -48,73 +48,73 @@
 
 ### 2.1 Sin filtros
 
-- [x] 2.1.1  Listado completo → `200` + **6 campañas** semilla
+- [✓] 2.1.1  Listado completo → `200` + **6 campañas** semilla
 
 ### 2.2 Filtro por `status`
 
-- [x] 2.2.1  `?status=active` → 3 campañas (IDs 2, 3, 5)
-- [x] 2.2.2  `?status=paused` → 1 campaña (ID 4)
-- [x] 2.2.3  `?status=closed` → 1 campaña (ID 1)
-- [x] 2.2.4  `?status=draft` → 1 campaña (ID 6)
-- [x] 2.2.5  `?status=ACTIVE` → 3 campañas (normalización mayúsculas)
-- [x] 2.2.6  `?status=inexistente` → `200` + `[]`
+- [✓] 2.2.1  `?status=active` → 3 campañas (IDs 2, 3, 5)
+- [✓] 2.2.2  `?status=paused` → 1 campaña (ID 4)
+- [✓] 2.2.3  `?status=closed` → 1 campaña (ID 1)
+- [✓] 2.2.4  `?status=draft` → 1 campaña (ID 6)
+- [✓] 2.2.5  `?status=ACTIVE` → 3 campañas (normalización mayúsculas)
+- [✓] 2.2.6  `?status=inexistente` → `200` + `[]`
 
 ### 2.3 Filtro por `client`
 
-- [x] 2.3.1  `?client=TechStore` → 2 campañas (IDs 5, 6)
-- [x] 2.3.2  `?client=SueñoSimple` (con tilde) → 4 campañas
-- [x] 2.3.3  `?client=suenosimple` (minúscula, sin tilde) → 4 campañas (normalización)
-- [x] 2.3.4  `?client=Inexistente` → `200` + `[]`
+- [✓] 2.3.1  `?client=TechStore` → 2 campañas (IDs 5, 6)
+- [✓] 2.3.2  `?client=SueñoSimple` (con tilde) → 4 campañas
+- [✓] 2.3.3  `?client=suenosimple` (minúscula, sin tilde) → 4 campañas (normalización)
+- [✓] 2.3.4  `?client=Inexistente` → `200` + `[]`
 
 ### 2.4 Filtros combinados
 
-- [x] 2.4.1  `?status=active&client=SueñoSimple` → 2 campañas (IDs 2, 3)
+- [✓] 2.4.1  `?status=active&client=SueñoSimple` → 2 campañas (IDs 2, 3)
 
 ### 2.5 Integridad de respuesta
 
-- [x] 2.5.1  Cada campaña devuelve: `id`, `name`, `client`, `type`, `status`, `budget`, `spent`, `currency`, `startDate`, `endDate`
+- [✓] 2.5.1  Cada campaña devuelve: `id`, `name`, `client`, `type`, `status`, `budget`, `spent`, `currency`, `startDate`, `endDate`
 
 ---
 
 ## 3. Obtener campaña por ID — `GET /api/campaigns/{id}`
 
-- [x] 3.1  ID existente (1–6) → `200` + datos coincidentes
-- [x] 3.2  ID de campaña recién creada → `200`
-- [x] 3.3  ID inexistente (999) → `404` + `{"error": "Campaign not found: 999"}`
-- [x] 3.4  ID tipo inválido (`"abc"`) → inválido
+- [✓] 3.1  ID existente (1–6) → `200` + datos coincidentes
+- [✓] 3.2  ID de campaña recién creada → `200`
+- [✓] 3.3  ID inexistente (999) → `404` + `{"error": "Campaign not found: 999"}`
+- [✓] 3.4  ID tipo inválido (`"abc"`) → inválido
 
 ---
 
 ## 4. Resumen global — `GET /api/campaigns/summary`
 
-- [x] 4.1  Estructura: `activeCampaigns`, `totalBudget`, `totalSpent`, `totalAvailable`, `consumptionPercentage`
-- [x] 4.2  Solo campañas **active** → `activeCampaigns=x` (IDs 2, 3, 5 por ejemplo si fueran 3)
-- [x] 4.3 Los cálculos son consistentes:
+- [✓] 4.1  Estructura: `activeCampaigns`, `totalBudget`, `totalSpent`, `totalAvailable`, `consumptionPercentage`
+- [✓] 4.2  Solo campañas **active** → `activeCampaigns=x` (IDs 2, 3, 5 por ejemplo si fueran 3)
+- [✓] 4.3 Los cálculos son consistentes:
       - totalAvailable = totalBudget − totalSpent
       - consumptionPercentage = (totalSpent / totalBudget) × 100
-- [x] 4.4  Crear campaña activa nueva → el resumen se actualiza
-- [ ] 4.5  Sin campañas activas → `activeCampaigns=0`, totales en 0
+- [✓] 4.4  Crear campaña activa nueva → el resumen se actualiza
+- [x] 4.5  Sin campañas activas → `activeCampaigns=0`, totales en 0
       - no se puede cambiar el estado de las campañas activas para verificar `activeCampaigns=0`
 
 ---
 
 ## 5. Resumen por campaña — `GET /api/campaigns/{id}/summary`
 
-- [x] 5.1  Campaña existente → `200` con: `campaignId`, `campaignName`, `client`, `totalBudget`, `spent`, `remaining`, `percentageUsed`
-- [x] 5.2  Campaña 3: `budget=120000`, `spent=67800` → `remaining=52200`, `percentageUsed=56.5`
-- [x] 5.3  Campaña 6: `spent=0` → `remaining=50000`, `percentageUsed=0`
-- [x] 5.4  Campaña sin gastos → `remaining=budget`, `percentageUsed=0`
-- [x] 5.5  `budget=0`, `spent=0` → `percentageUsed=0`
-- [x] 5.6  ID inexistente → `404`
+- [✓] 5.1  Campaña existente → `200` con: `campaignId`, `campaignName`, `client`, `totalBudget`, `spent`, `remaining`, `percentageUsed`
+- [✓] 5.2  Campaña 3: `budget=120000`, `spent=67800` → `remaining=52200`, `percentageUsed=56.5`
+- [✓] 5.3  Campaña 6: `spent=0` → `remaining=50000`, `percentageUsed=0`
+- [✓] 5.4  Campaña sin gastos → `remaining=budget`, `percentageUsed=0`
+- [✓] 5.5  `budget=0`, `spent=0` → `percentageUsed=0`
+- [✓] 5.6  ID inexistente → `404`
 
 ---
 
 ## 6. Listar gastos — `GET /api/campaigns/{id}/expenses`
 
-- [x] 6.1  Campaña con gastos (ID 1) → `200` + **3 gastos**
-- [x] 6.2  Campaña sin gastos (ID 6) → `200` + `[]`
-- [x] 6.3  ID inexistente → `404`
-- [x] 6.4  Cada gasto tiene: `id`, `campaignId`, `description`, `amount`, `category`, `date`
+- [✓] 6.1  Campaña con gastos (ID 1) → `200` + **3 gastos**
+- [✓] 6.2  Campaña sin gastos (ID 6) → `200` + `[]`
+- [✓] 6.3  ID inexistente → `404`
+- [✓] 6.4  Cada gasto tiene: `id`, `campaignId`, `description`, `amount`, `category`, `date`
 
 ---
 
@@ -122,30 +122,30 @@
 
 ### 7.1 Casos exitosos
 
-- [x] 7.1.1  Gasto válido → `201 Created` + `id` autoasignado + `campaignId` correcto
-- [x] 7.1.2  El campo `spent` de la campaña se incrementa en `amount`
-- [x] 7.1.3  Registrar 2 gastos seguidos → `spent` acumula ambos montos
-- [x] 7.1.4  Gasto con `amount=0` → `201` (se acepta, `spent` no cambia)
+- [✓] 7.1.1  Gasto válido → `201 Created` + `id` autoasignado + `campaignId` correcto
+- [✓] 7.1.2  El campo `spent` de la campaña se incrementa en `amount`
+- [✓] 7.1.3  Registrar 2 gastos seguidos → `spent` acumula ambos montos
+- [✓] 7.1.4  Gasto con `amount=0` → `201` (se acepta, `spent` no cambia)
 
 ### 7.2 Casos de error / borde
 
-- [x] 7.2.1  Campaña inexistente → `404`
-- [x] 7.2.2  `amount` negativo → **se acepta** (sin validación) — `spent` **disminuye**
-- [x] 7.2.3  `category` inválido (`"otro"`) → **se acepta** (sin validación)
-- [x] 7.2.4  `amount` extremadamente grande → se acepta (sin límite)
+- [✓] 7.2.1  Campaña inexistente → `404`
+- [✓] 7.2.2  `amount` negativo → **se acepta** (sin validación) — `spent` **disminuye**
+- [✓] 7.2.3  `category` inválido (`"otro"`) → **se acepta** (sin validación)
+- [✓] 7.2.4  `amount` extremadamente grande → se acepta (sin límite)
 
 ---
 
 ## 8. Actualizar presupuesto — `PUT /api/campaigns/{id}/budget`
 
-- [x] 8.1  Budget válido (ID 6: 50 000 → 75 000) → `200` + `budget=75000`
-- [x] 8.2  **`spent` se resetea a 0** — comportamiento documentado, verificar
-- [x] 8.3  Campaña con gastos previos → spent pasa a 0 (pérdida de gastos)
-- [x] 8.4  `budget=0` → `200`
-- [x] 8.5  `budget` negativo → **se acepta** (sin validación)
-- [x] 8.6  `budget=null` → **se acepta** (sin validación)
-- [x] 8.7  ID inexistente → `404`
-- [x] 8.8  Resumen global se actualiza tras cambiar budget de campaña activa
+- [✓] 8.1  Budget válido (ID 6: 50 000 → 75 000) → `200` + `budget=75000`
+- [✓] 8.2  **`spent` se resetea a 0** — comportamiento documentado, verificar
+- [✓] 8.3  Campaña con gastos previos → spent pasa a 0 (pérdida de gastos)
+- [✓] 8.4  `budget=0` → `200`
+- [✓] 8.5  `budget` negativo → **se acepta** (sin validación)
+- [✓] 8.6  `budget=null` → **se acepta** (sin validación)
+- [✓] 8.7  ID inexistente → `404`
+- [✓] 8.8  Resumen global se actualiza tras cambiar budget de campaña activa
 
 ---
 
@@ -155,17 +155,17 @@
 
 ### 9.1 Ciclo de vida
 
-- [x] 9.1.1  Crear campaña → `GET /api/campaigns` → aparece en el listado
-- [x] 9.1.2  Crear campaña → `GET /api/campaigns/{id}` → existe con datos correctos
-- [x] 9.1.3  Actualizar budget → `GET /api/campaigns/{id}` → refleja el cambio
-- [x] 9.1.4  Registrar gasto → `GET /api/campaigns/{id}/expenses` → aparece el gasto
-- [x] 9.1.5  Registrar gasto → `GET /api/campaigns/{id}` → `spent` se incrementó
-- [x] 9.1.6  Múltiples gastos → resumen global refleja la suma
+- [✓] 9.1.1  Crear campaña → `GET /api/campaigns` → aparece en el listado
+- [✓] 9.1.2  Crear campaña → `GET /api/campaigns/{id}` → existe con datos correctos
+- [✓] 9.1.3  Actualizar budget → `GET /api/campaigns/{id}` → refleja el cambio
+- [✓] 9.1.4  Registrar gasto → `GET /api/campaigns/{id}/expenses` → aparece el gasto
+- [✓] 9.1.5  Registrar gasto → `GET /api/campaigns/{id}` → `spent` se incrementó
+- [✓] 9.1.6  Múltiples gastos → resumen global refleja la suma
 
 ### 9.2 Relaciones
 
-- [x] 9.2.1  Gasto con `campaignId=X` aparece solo en `GET /api/campaigns/X/expenses`
-- [x] 9.2.2  Gasto en campaña A → no aparece en `GET /api/campaigns/B/expenses`
+- [✓] 9.2.1  Gasto con `campaignId=X` aparece solo en `GET /api/campaigns/X/expenses`
+- [✓] 9.2.2  Gasto en campaña A → no aparece en `GET /api/campaigns/B/expenses`
 
 ---
 
@@ -184,34 +184,34 @@
 
 ### 11.1 CORS
 
-- [x] 11.1.1  `Origin: http://localhost:8000` → `Access-Control-Allow-Origin: http://localhost:8000` ✅
-- [x] 11.1.2  `Origin: http://localhost:5173` → `Access-Control-Allow-Origin: http://localhost:5173` ✅
-- [x] 11.1.3  `Origin: http://evil.com` → sin header CORS (bloqueado) ✅
+- [✓] 11.1.1  `Origin: http://localhost:8000` → `Access-Control-Allow-Origin: http://localhost:8000` ✅
+- [✓] 11.1.2  `Origin: http://localhost:5173` → `Access-Control-Allow-Origin: http://localhost:5173` ✅
+- [✓] 11.1.3  `Origin: http://evil.com` → sin header CORS (bloqueado) ✅
 
 ### 11.2 Reporting (Python)
 
-- [x] 11.2.1  Ejecutar `python reporting/extract.py` → `reporting/report.xlsx` generado ✅
-- [x] 11.2.2  Hoja "Campañas": 10 campañas con columnas correctas ✅
-- [x] 11.2.3  Hoja "Resumen": KPIs coinciden con API (`activeCampaigns=5`, `totalBudget=351000`, etc.) ✅
+- [✓] 11.2.1  Ejecutar `python reporting/extract.py` → `reporting/report.xlsx` generado ✅
+- [✓] 11.2.2  Hoja "Campañas": 10 campañas con columnas correctas ✅
+- [✓] 11.2.3  Hoja "Resumen": KPIs coinciden con API (`activeCampaigns=5`, `totalBudget=351000`, etc.) ✅
 
 ---
 
 ## 12. Regresión — tests automatizados
 
-- [x] 12.1  Ejecutar `mvn test` → **18 tests OK**
+- [✓] 12.1  Ejecutar `mvn test` → **18 tests OK**
 
 ### 12.2 Casos no cubiertos por tests actuales
 
-- [x] 12.2.1  Crear campaña con `name` vacío → 400
-- [x] 12.2.2  Crear campaña con `budget` negativo → 400
-- [x] 12.2.3  Filtrar por `status` + `client` combinados
-- [x] 12.2.4  Listar tras crear campaña nueva (verificar que aparece)
-- [x] 12.2.5  Resumen global tras alta/actualización de campañas
-- [x] 12.2.6  Gasto con `amount` negativo (se acepta — posible bug)
-- [x] 12.2.7  `updateBudget` con valor negativo o nulo
-- [x] 12.2.8  `updateBudget` resetea `spent` a 0
-- [x] 12.2.9  Registrar gasto incrementa `spent`
-- [x] 12.2.10  `GET /` → 302 redirect a Swagger
+- [✓] 12.2.1  Crear campaña con `name` vacío → 400
+- [✓] 12.2.2  Crear campaña con `budget` negativo → 400
+- [✓] 12.2.3  Filtrar por `status` + `client` combinados
+- [✓] 12.2.4  Listar tras crear campaña nueva (verificar que aparece)
+- [✓] 12.2.5  Resumen global tras alta/actualización de campañas
+- [✓] 12.2.6  Gasto con `amount` negativo (se acepta — posible bug)
+- [✓] 12.2.7  `updateBudget` con valor negativo o nulo
+- [✓] 12.2.8  `updateBudget` resetea `spent` a 0
+- [✓] 12.2.9  Registrar gasto incrementa `spent`
+- [✓] 12.2.10  `GET /` → 302 redirect a Swagger
 
 ---
 
