@@ -18,18 +18,18 @@ API REST (Budget Manager) para la gestión de presupuestos de campañas de marke
 
 | Campo | Valor |
 |---|---|
-| Rama actual | `main` |
+| Rama actual | `dev` |
 | Rama por defecto | `main` |
 | Cambios sin commitear | Ninguno (working tree limpio) |
-| Sincronización | Al día con `origin/main` |
-| Último commit | `c808bf7 — Add files via upload` |
+| Sincronización | Al día con `origin/dev` |
+| Último commit | `c12e2e7 — feat(budget): agrega endpoints PUT/{id} y PATCH/{id}/status para editar campañas` |
 
 ## Estado funcional
 
 **Implementado y operativo:**
 
 - Aplicación Spring Boot arrancable con `mvn spring-boot:run`.
-- Endpoints de campañas: listado, filtro por estado, detalle, resumen, gastos y actualización de presupuesto.
+- Endpoints de campañas: listado, filtro por estado/cliente, detalle, resumen, gastos, alta, **edición completa** y **cambio de estado**.
 - Capa completa: `controller` · `service` · `repository` · `model` · `exception`.
 - Manejo global de errores (`GlobalExceptionHandler`).
 - Documentación interactiva con Swagger / springdoc-openapi.
@@ -118,3 +118,47 @@ mvn spring-boot:run
 
 - `curl -H "Origin: http://localhost:8000"` a `/api/campaigns` devuelve cabecera `Access-Control-Allow-Origin`.
 - La página de clientes de Genius-Landings carga campañas sin errores CORS tras reiniciar el servidor.
+
+---
+
+### 2026-06-25 — Fix de datos: cliente `SuenoSimple` → `SueñoSimple`
+
+**Problema detectado**
+
+- Los datos hardcodeados en `CampaignRepository.java` usaban `"SuenoSimple"` (sin ñ) mientras que el CRM usaba `"SueñoSimple"` (con ñ). El Dashboard mostraba ambos clientes como distintos en el selector de filtro.
+
+**Cambios realizados**
+
+- `src/main/java/com/genius/budgetmanager/repository/CampaignRepository.java`: corregidos los 4 registros de campaña de SueñoSimple.
+- `src/test/java/com/genius/budgetmanager/controller/CampaignControllerTest.java`: actualizadas las 4 aserciones.
+
+**Verificaciones**
+
+- `GET /api/campaigns` devuelve `"client": "SueñoSimple"` en todas las campañas del cliente.
+- El Dashboard muestra un único cliente `SueñoSimple` en el selector.
+
+---
+
+### 2026-06-30 — Edición de campañas: nuevos endpoints `PUT /{id}` y `PATCH /{id}/status`
+
+**Problema detectado**
+
+- No existían endpoints para editar los datos de una campaña ni para cambiar su estado desde el Dashboard.
+
+**Cambios realizados**
+
+- `CampaignRepository.java`: método `updateCampaign(id, patch)` con actualización parcial de campos.
+- `CampaignService.java`: métodos `updateCampaign(id, patch)` y `updateStatus(id, status)`.
+- `CampaignController.java`:
+  - `PUT /api/campaigns/{id}` — actualiza todos los campos de una campaña.
+  - `PATCH /api/campaigns/{id}/status` — cambia solo el estado (`{"status": "active"}`).
+
+**Estado funcional**
+
+- Endpoints operativos: listado, filtro, detalle, resumen, gastos, alta, edición completa y cambio de estado.
+- Requiere reinicio del servidor para activar los nuevos endpoints.
+
+**Verificaciones**
+
+- `PATCH /api/campaigns/1/status` con `{"status": "paused"}` devuelve 200 con campaña actualizada.
+- `PUT /api/campaigns/1` con payload completo devuelve 200.
