@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/campaigns")
@@ -84,11 +83,13 @@ public class CampaignController {
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Cambiar estado de una campaña")
-    public ResponseEntity<Campaign> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String status = body.get("status");
+    public ResponseEntity<Campaign> updateStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest body) {
+        String status = body.status();
         if (status == null || status.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(campaignService.updateStatus(id, status));
     }
+
+    record StatusUpdateRequest(String status) {}
 }
