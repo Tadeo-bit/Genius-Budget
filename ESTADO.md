@@ -162,3 +162,20 @@ mvn spring-boot:run
 
 - `PATCH /api/campaigns/1/status` con `{"status": "paused"}` devuelve 200 con campaña actualizada.
 - `PUT /api/campaigns/1` con payload completo devuelve 200.
+
+---
+
+### 2026-07-03 — Fix Swagger PATCH /campaigns/{id}/status (commit `174b5df`)
+
+**Cambio realizado**
+
+- `CampaignController.java`: reemplazado `Map<String, String>` por el record tipado `StatusUpdateRequest(String status)` como `@RequestBody` del endpoint `PATCH /api/campaigns/{id}/status`.
+- Eliminado el import `java.util.Map`.
+
+**Motivo**
+
+Swagger generaba `additionalProp1`, `additionalProp2`, `additionalProp3` al usar `Map<String,String>` como body. El record produce el schema correcto con un único campo `status`.
+
+**Estado Git**
+
+- Commit pusheado a `origin/dev` (`174b5df`).
