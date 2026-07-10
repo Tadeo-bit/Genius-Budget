@@ -1,10 +1,12 @@
 package com.genius.budgetmanager.controller;
 
+import com.genius.budgetmanager.model.AuditLog;
 import com.genius.budgetmanager.model.BudgetSummary;
 import com.genius.budgetmanager.model.BudgetUpdateRequest;
 import com.genius.budgetmanager.model.Campaign;
 import com.genius.budgetmanager.model.Expense;
 import com.genius.budgetmanager.model.GlobalBudgetSummary;
+import com.genius.budgetmanager.service.AuditLogService;
 import com.genius.budgetmanager.service.CampaignService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +26,9 @@ public class CampaignController {
     @Autowired
     private CampaignService campaignService;
 
+    @Autowired
+    private AuditLogService auditLogService;
+
     @GetMapping
     @Operation(summary = "Listar campanas", description = "Retorna todas las campanas. Acepta filtros opcionales por status y cliente.")
     public ResponseEntity<List<Campaign>> getCampaigns(
@@ -37,6 +42,20 @@ public class CampaignController {
     @Operation(summary = "Crear campana")
     public ResponseEntity<Campaign> createCampaign(@RequestBody Campaign campaign) {
         return ResponseEntity.status(HttpStatus.CREATED).body(campaignService.createCampaign(campaign));
+    }
+
+    @GetMapping("/history")
+    @Operation(summary = "Historial de cambios de campanas")
+    public ResponseEntity<List<AuditLog>> getHistory(
+            @RequestParam(required = false) String action,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo,
+            @RequestParam(required = false) String user,
+            @RequestParam(required = false) Long entityId
+    ) {
+        return ResponseEntity.ok(
+            auditLogService.getHistory("campaign", action, dateFrom, dateTo, user, entityId)
+        );
     }
 
     @GetMapping("/summary")

@@ -1,5 +1,7 @@
 package com.genius.budgetmanager.service;
 
+import com.genius.budgetmanager.interceptor.AuditInterceptor;
+import com.genius.budgetmanager.model.AuditLog;
 import com.genius.budgetmanager.model.BudgetSummary;
 import com.genius.budgetmanager.model.Campaign;
 import com.genius.budgetmanager.model.Expense;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,6 +21,9 @@ public class CampaignService {
 
     @Autowired
     private CampaignRepository repository;
+
+    @Autowired
+    private AuditLogService auditLogService;
 
     // Fix BM-F01/BM-F02: soportar filtros por status y cliente en el listado.
     public List<Campaign> getCampaigns(String status, String client) {
@@ -55,7 +61,10 @@ public class CampaignService {
             campaign.setCurrency("ARS");
         }
 
-        return repository.saveCampaign(campaign);
+        Campaign saved = repository.saveCampaign(campaign);
+        auditLogService.record("campaign", saved.getId(), "create",
+                resolveCurrentUser(), null, AuditLog.campaignToMap(saved));
+        return saved;
     }
 
     public Campaign getCampaignById(Long id) {
@@ -89,9 +98,14 @@ public class CampaignService {
 
     public Expense addExpense(Long campaignId, Expense expense) {
         Campaign campaign = getCampaignById(campaignId);
+        Map<String, Object> before = AuditLog.campaignToMap(campaign);
         expense.setCampaignId(campaignId);
         campaign.setSpent(campaign.getSpent() + expense.getAmount());
-        return repository.saveExpense(expense);
+        Expense saved = repository.saveExpense(expense);
+        Map<String, Object> after = AuditLog.campaignToMap(campaign);
+        auditLogService.record("campaign", campaignId, "expense_added",
+                resolveCurrentUser(), before, after);
+        return saved;
     }
 
     public GlobalBudgetSummary getGlobalBudgetSummary() {
@@ -136,6 +150,11 @@ public class CampaignService {
         campaign.setSpent(0.0);
         campaign.setBudget(newBudget);
         return campaign;
+    }
+
+    private String resolveCurrentUser() {
+        String user = AuditInterceptor.CurrentUser.get();
+        return user != null ? user : "unknown";
     }
 
     private String normalize(String value) {
