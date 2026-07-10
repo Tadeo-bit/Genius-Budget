@@ -5,6 +5,8 @@ import com.genius.budgetmanager.model.Campaign;
 import com.genius.budgetmanager.model.Expense;
 import com.genius.budgetmanager.model.GlobalBudgetSummary;
 import com.genius.budgetmanager.repository.CampaignRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 @Service
 public class CampaignService {
 
+    private static final Logger log = LoggerFactory.getLogger(CampaignService.class);
+
     @Autowired
     private CampaignRepository repository;
 
@@ -24,10 +28,16 @@ public class CampaignService {
         final String normalizedStatus = normalize(status);
         final String normalizedClient = normalize(client);
 
-        return repository.findAll().stream()
+        List<Campaign> results = repository.findAll().stream()
             .filter(c -> normalizedStatus == null || normalizedStatus.equals(normalize(c.getStatus())))
             .filter(c -> normalizedClient == null || normalizedClient.equals(normalize(c.getClient())))
                 .collect(Collectors.toList());
+
+        if (normalizedClient != null) {
+            log.info("[VIS-10] GET /campaigns?client={} → Filtro aplicado | {} campaña(s) encontradas para '{}'",
+                    client, results.size(), client);
+        }
+        return results;
     }
 
     // Fix BM-F01: habilitar alta de nuevas campanas desde API.
@@ -55,7 +65,10 @@ public class CampaignService {
             campaign.setCurrency("ARS");
         }
 
-        return repository.saveCampaign(campaign);
+        Campaign created = repository.saveCampaign(campaign);
+        log.info("[VIS-09] POST /campaigns → Campaña creada | id={} name='{}' client='{}' budget={} status={}",
+                created.getId(), created.getName(), created.getClient(), created.getBudget(), created.getStatus());
+        return created;
     }
 
     public Campaign getCampaignById(Long id) {
@@ -119,7 +132,10 @@ public class CampaignService {
         if (patch.getBudget() != null && patch.getBudget() < 0) {
             throw new IllegalArgumentException("Budget must be >= 0");
         }
-        return repository.updateCampaign(id, patch);
+        Campaign updated = repository.updateCampaign(id, patch);
+        log.info("[TC-204] PUT /campaigns/{} → Campaña actualizada correctamente | name='{}' client='{}' budget={} status={}",
+                updated.getId(), updated.getName(), updated.getClient(), updated.getBudget(), updated.getStatus());
+        return updated;
     }
 
     public Campaign updateStatus(Long id, String status) {
@@ -128,7 +144,10 @@ public class CampaignService {
         }
         Campaign patch = new Campaign();
         patch.setStatus(status);
-        return repository.updateCampaign(id, patch);
+        Campaign updated = repository.updateCampaign(id, patch);
+        log.info("[TC-201] PATCH /campaigns/{}/status → Estado actualizado correctamente | name='{}' estado anterior → nuevo estado='{}'",
+                updated.getId(), updated.getName(), updated.getStatus());
+        return updated;
     }
 
     public Campaign updateBudget(Long campaignId, Double newBudget) {
