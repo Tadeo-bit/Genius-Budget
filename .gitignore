@@ -1,1 +1,28 @@
-target
+### IDE ###
+.idea/
+*.iml
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+*~
+
+### Maven ###
+target/
+pom.xml.versionsBackup
+*.releaseBackup
+
+### OS ###
+.DS_Store
+Thumbs.db
+*.log
+
+### Others ###
+*.class
+*.jar
+*.war
+*.ear
+*.tar.gz
+*.zip
