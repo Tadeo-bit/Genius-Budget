@@ -14,6 +14,7 @@ public class CampaignRepository {
 
     private final List<Campaign> campaigns = new ArrayList<>();
     private final List<Expense> expenses = new ArrayList<>();
+    private long nextCampaignId = 7;
     private long nextExpenseId = 11;
 
     public CampaignRepository() {
@@ -21,13 +22,13 @@ public class CampaignRepository {
     }
 
     private void loadData() {
-        campaigns.add(new Campaign(1L, "Black Friday 2025 - Display", "SuenoSimple", "display", "closed",
+        campaigns.add(new Campaign(1L, "Black Friday 2025 - Display", "SueñoSimple", "display", "closed",
                 150000.0, 148200.0, "ARS", "2025-11-01", "2025-11-30"));
-        campaigns.add(new Campaign(2L, "Email Recupero de Carritos", "SuenoSimple", "email", "active",
+        campaigns.add(new Campaign(2L, "Email Recupero de Carritos", "SueñoSimple", "email", "active",
                 30000.0, 12400.0, "ARS", "2026-01-01", "2026-03-31"));
-        campaigns.add(new Campaign(3L, "Social Ads Q1 2026", "SuenoSimple", "social_ads", "active",
+        campaigns.add(new Campaign(3L, "Social Ads Q1 2026", "SueñoSimple", "social_ads", "active",
                 120000.0, 67800.0, "ARS", "2026-01-01", "2026-03-31"));
-        campaigns.add(new Campaign(4L, "Influencers Verano 2026", "SuenoSimple", "influencer", "paused",
+        campaigns.add(new Campaign(4L, "Influencers Verano 2026", "SueñoSimple", "influencer", "paused",
                 80000.0, 45000.0, "ARS", "2025-12-01", "2026-02-28"));
         campaigns.add(new Campaign(5L, "Google Ads Performance - Marzo", "TechStore", "search_ads", "active",
                 200000.0, 195600.0, "ARS", "2026-03-01", "2026-03-31"));
@@ -54,10 +55,31 @@ public class CampaignRepository {
         return campaigns.stream().filter(c -> c.getId().equals(id)).findFirst();
     }
 
+    public Campaign saveCampaign(Campaign campaign) {
+        campaign.setId(nextCampaignId++);
+        campaigns.add(campaign);
+        return campaign;
+    }
+
     public List<Expense> findExpensesByCampaignId(Long campaignId) {
         return expenses.stream()
                 .filter(e -> e.getCampaignId().equals(campaignId))
                 .collect(Collectors.toList());
+    }
+
+    public Campaign updateCampaign(Long id, Campaign patch) {
+        Campaign existing = findById(id)
+                .orElseThrow(() -> new RuntimeException("Campaign not found: " + id));
+        if (patch.getName() != null && !patch.getName().isBlank())  existing.setName(patch.getName());
+        if (patch.getClient() != null && !patch.getClient().isBlank()) existing.setClient(patch.getClient());
+        if (patch.getType() != null && !patch.getType().isBlank())   existing.setType(patch.getType());
+        if (patch.getStatus() != null && !patch.getStatus().isBlank()) existing.setStatus(patch.getStatus());
+        if (patch.getBudget() != null)    existing.setBudget(patch.getBudget());
+        if (patch.getSpent() != null)     existing.setSpent(patch.getSpent());
+        if (patch.getCurrency() != null && !patch.getCurrency().isBlank()) existing.setCurrency(patch.getCurrency());
+        if (patch.getStartDate() != null) existing.setStartDate(patch.getStartDate());
+        if (patch.getEndDate() != null)   existing.setEndDate(patch.getEndDate());
+        return existing;
     }
 
     public Expense saveExpense(Expense expense) {

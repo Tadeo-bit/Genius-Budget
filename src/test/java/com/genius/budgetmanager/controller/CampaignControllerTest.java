@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CampaignControllerTest {
 
     @Autowired
@@ -24,13 +26,34 @@ class CampaignControllerTest {
                 .andExpect(jsonPath("$.length()").value(6));
     }
 
+        @Test
+        void getCampaigns_filterByStatus_returnsMatchingCampaigns() throws Exception {
+                mockMvc.perform(get("/api/campaigns").param("status", "active"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(3));
+        }
+
+        @Test
+        void getCampaigns_filterByClient_returnsMatchingCampaigns() throws Exception {
+                mockMvc.perform(get("/api/campaigns").param("client", "TechStore"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(2));
+        }
+
+        @Test
+        void getCampaigns_filterByClientWithAccent_returnsMatchingCampaigns() throws Exception {
+                mockMvc.perform(get("/api/campaigns").param("client", "SueñoSimple"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(4));
+        }
+
     @Test
     void getCampaignById_existingId_returnsCampaign() throws Exception {
         mockMvc.perform(get("/api/campaigns/3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(3))
                 .andExpect(jsonPath("$.name").value("Social Ads Q1 2026"))
-                .andExpect(jsonPath("$.client").value("SuenoSimple"))
+                .andExpect(jsonPath("$.client").value("SueñoSimple"))
                 .andExpect(jsonPath("$.status").value("active"));
     }
 
@@ -46,9 +69,10 @@ class CampaignControllerTest {
         mockMvc.perform(get("/api/campaigns/3/summary"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.campaignId").value(3))
-                .andExpect(jsonPath("$.client").value("SuenoSimple"))
+                .andExpect(jsonPath("$.client").value("SueñoSimple"))
                 .andExpect(jsonPath("$.totalBudget").value(120000.0))
                 .andExpect(jsonPath("$.spent").value(67800.0))
+                .andExpect(jsonPath("$.remaining").value(52200.0))
                 .andExpect(jsonPath("$.percentageUsed").exists());
     }
 
@@ -114,6 +138,48 @@ class CampaignControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createCampaign_validPayload_returnsCreatedCampaign() throws Exception {
+        String body = """
+                {
+                  "name": "Campana Nueva Camila",
+                  "client": "SueñoSimple",
+                  "type": "social_ads",
+                  "status": "draft",
+                  "budget": 95000.0,
+                  "currency": "ARS",
+                  "startDate": "2026-07-01",
+                  "endDate": "2026-08-01"
+                }
+                """;
+
+        mockMvc.perform(post("/api/campaigns")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("Campana Nueva Camila"))
+                .andExpect(jsonPath("$.client").value("SueñoSimple"))
+                .andExpect(jsonPath("$.spent").value(0.0));
+    }
+
+    @Test
+    void createCampaign_missingClient_returnsBadRequest() throws Exception {
+        String body = """
+                {
+                  "name": "Campana invalida",
+                  "type": "social_ads",
+                  "budget": 1000.0
+                }
+                """;
+
+        mockMvc.perform(post("/api/campaigns")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists());
     }
 
     @Test

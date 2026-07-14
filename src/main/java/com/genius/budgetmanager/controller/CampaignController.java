@@ -1,10 +1,12 @@
 package com.genius.budgetmanager.controller;
 
+import com.genius.budgetmanager.model.AuditLog;
 import com.genius.budgetmanager.model.BudgetSummary;
 import com.genius.budgetmanager.model.BudgetUpdateRequest;
 import com.genius.budgetmanager.model.Campaign;
 import com.genius.budgetmanager.model.Expense;
 import com.genius.budgetmanager.model.GlobalBudgetSummary;
+import com.genius.budgetmanager.service.AuditLogService;
 import com.genius.budgetmanager.service.CampaignService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,19 +19,43 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/campaigns")
+@CrossOrigin(origins = {"http://localhost:8000", "http://localhost:5173"})
 @Tag(name = "Campaigns", description = "Gestion de campanas y presupuestos")
 public class CampaignController {
 
     @Autowired
     private CampaignService campaignService;
 
+    @Autowired
+    private AuditLogService auditLogService;
+
     @GetMapping
-    @Operation(summary = "Listar campanas", description = "Retorna todas las campanas. Acepta filtro opcional por status.")
-    public ResponseEntity<List<Campaign>> getCampaigns(@RequestParam(required = false) String status) {
-        if (status != null && !status.isBlank()) {
-            return ResponseEntity.ok(campaignService.getCampaignsByStatus(status));
-        }
-        return ResponseEntity.ok(campaignService.getAllCampaigns());
+    @Operation(summary = "Listar campanas", description = "Retorna todas las campanas. Acepta filtros opcionales por status y cliente.")
+    public ResponseEntity<List<Campaign>> getCampaigns(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String client
+    ) {
+        return ResponseEntity.ok(campaignService.getCampaigns(status, client));
+    }
+
+    @PostMapping
+    @Operation(summary = "Crear campana")
+    public ResponseEntity<Campaign> createCampaign(@RequestBody Campaign campaign) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(campaignService.createCampaign(campaign));
+    }
+
+    @GetMapping("/history")
+    @Operation(summary = "Historial de cambios de campanas")
+    public ResponseEntity<List<AuditLog>> getHistory(
+            @RequestParam(required = false) String action,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo,
+            @RequestParam(required = false) String user,
+            @RequestParam(required = false) Long entityId
+    ) {
+        return ResponseEntity.ok(
+            auditLogService.getHistory("campaign", action, dateFrom, dateTo, user, entityId)
+        );
     }
 
     @GetMapping("/summary")
@@ -67,4 +93,22 @@ public class CampaignController {
     public ResponseEntity<Campaign> updateBudget(@PathVariable Long id, @RequestBody BudgetUpdateRequest request) {
         return ResponseEntity.ok(campaignService.updateBudget(id, request.getBudget()));
     }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Actualizar datos de una campaña")
+    public ResponseEntity<Campaign> updateCampaign(@PathVariable Long id, @RequestBody Campaign campaign) {
+        return ResponseEntity.ok(campaignService.updateCampaign(id, campaign));
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Cambiar estado de una campaña")
+    public ResponseEntity<Campaign> updateStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest body) {
+        String status = body.status();
+        if (status == null || status.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(campaignService.updateStatus(id, status));
+    }
+
+    record StatusUpdateRequest(String status) {}
 }
